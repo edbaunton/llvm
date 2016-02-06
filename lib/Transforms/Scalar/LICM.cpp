@@ -954,16 +954,15 @@ bool llvm::promoteLoopAccessesToScalars(AliasSet &AS,
       // If there is an non-load/store instruction in the loop, we can't promote
       // it.
       if (const LoadInst *Load = dyn_cast<LoadInst>(UI)) {
-        assert(!Load->isVolatile() && "AST broken");
-        if (!Load->isSimple())
+        if (!Load->isSimple() || Load->isUnordered())
           return Changed;
       } else if (const StoreInst *Store = dyn_cast<StoreInst>(UI)) {
         // Stores *of* the pointer are not interesting, only stores *to* the
         // pointer.
         if (UI->getOperand(1) != ASIV)
           continue;
-        assert(!Store->isVolatile() && "AST broken");
-        if (!Store->isSimple())
+
+        if (!Store->isSimple() || !Store->isUnordered())
           return Changed;
         // Don't sink stores from loops without dedicated block exits. Exits
         // containing indirect branches are not transformed by loop simplify,
