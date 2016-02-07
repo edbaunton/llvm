@@ -954,7 +954,7 @@ bool llvm::promoteLoopAccessesToScalars(AliasSet &AS,
       // If there is an non-load/store instruction in the loop, we can't promote
       // it.
       if (const LoadInst *Load = dyn_cast<LoadInst>(UI)) {
-        if (!Load->isSimple() || Load->isUnordered())
+        if (!Load->isSimple() || !Load->isUnordered())
           return Changed;
       } else if (const StoreInst *Store = dyn_cast<StoreInst>(UI)) {
         // Stores *of* the pointer are not interesting, only stores *to* the
